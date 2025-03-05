@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Profesor - MusicFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md py-4">
+        <div class="container mx-auto flex items-center justify-between px-6">
+            <a href="index.html" class="text-2xl font-bold text-indigo-600">MusicFinder</a>
+            <ul class="flex space-x-6 text-gray-700">
+                <li><a href="index.html" class="hover:text-indigo-600">Inicio</a></li>
+                <li><a href="explorar.html" class="hover:text-indigo-600">Explorar</a></li>
+                <li><a href="reservas.html" class="hover:text-indigo-600">Reservas</a></li>
+                <li><a href="pagos.html" class="hover:text-indigo-600">Pagos</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Perfil del Profesor -->
+    <section class="container mx-auto px-6 py-12">
+        <div id="perfil-profesor" class="bg-white p-6 rounded-lg shadow-md max-w-3xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-800 text-center">Perfil del Profesor</h2>
+            <div id="contenido-perfil" class="mt-6"></div>
+        </div>
+        <div class="mt-6 text-center">
+            <a href="explorar.html" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">Volver a Explorar</a>
+        </div>
+    </section>
+
+    <script>
+        async function obtenerProfesor() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const profesorId = urlParams.get("id");
+
+            if (!profesorId) {
+                document.getElementById("contenido-perfil").innerHTML = "<p class='text-red-500 text-center'>Profesor no encontrado.</p>";
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://10.3.1.183:3000/api/profiles/getProfile/${profesorId}`);
+                if (!response.ok) throw new Error("No se pudo obtener la información del profesor");
+
+                const profesor = await response.json();
+                mostrarPerfil(profesor);
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("contenido-perfil").innerHTML = "<p class='text-red-500 text-center'>Error al cargar el perfil.</p>";
+            }
+        }
+        function mostrarPerfil(profesor) {
+    // Asegúrate de que 'especialidades' sea un array
+   // const instrumento = Array.isArray(profesor.instrumento) ? profesor.instrumento : [];
+
+    document.getElementById("contenido-perfil").innerHTML = `
+        <div class="text-center">
+            <img src="https://picsum.photos/150" class="rounded-full w-32 h-32 mx-auto mb-4">
+
+            <h3 class="text-2xl font-bold text-indigo-600">${profesor.nombre}</h3>
+            <p class="text-gray-700 mt-2">${profesor.descripcion || "No disponible"}</p>
+        </div>
+        <div class="mt-6">
+            <h4 class="text-xl font-semibold text-gray-800">Especialidades:</h4>
+            <p class="text-gray-700">${profesor.instrumento || "No disponible"}</p>
+        </div>
+           <div class="mt-4">
+            <h4 class="text-xl font-semibold text-gray-800">Horarios:</h4>
+            <p class="text-gray-700">${profesor.horariosDisponibles ? `${profesor.horariosDisponibles}` : "No disponible"}</p>
+        </div>
+        <div class="mt-4">
+            <h4 class="text-xl font-semibold text-gray-800">Tarifas:</h4>
+            <p class="text-gray-700">${profesor.precio ? `$${profesor.precio}/hora` : "No disponible"}</p>
+        </div>
+        <div class="mt-6 text-center">
+            <a href="reservas.html?id=${profesor.id}" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Reservar Clase</a>
+        </div>
+    `;
+}
+
+
+
+        obtenerProfesor();
+    </script>
+</body>
+</html>

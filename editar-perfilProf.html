@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - MusicFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-md py-4">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <h1 class="text-2xl font-bold text-indigo-600">MusicFinder - Editar Perfil</h1>
+            <button id="logout-button" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">
+                Cerrar Sesión
+            </button>
+        </div>
+    </nav>
+
+    <div class="min-h-screen flex justify-center items-center p-8">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-7xl w-full">
+            <h2 class="text-2xl font-bold text-indigo-600 mb-6">Editar Perfil</h2>
+            <form id="edit-profile-form">
+                <div class="mb-4">
+                    <label for="nombre" class="block text-gray-700">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-600">
+                </div>
+                <div class="mb-4">
+                    <label for="instrumento" class="block text-gray-700">Instrumento</label>
+                    <input type="text" id="instrumento" name="instrumento" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-600">
+                </div>
+                <div class="mb-4">
+                    <label for="precio" class="block text-gray-700">Precio</label>
+                    <input type="number" id="precio" name="precio" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-600">
+                </div>
+                <div class="mb-4">
+                    <label for="descripcion" class="block text-gray-700">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-600"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="ubicacion" class="block text-gray-700">Ubicación</label>
+                    <input type="text" id="ubicacion-busqueda" placeholder="Buscar calle, ciudad o estado" class="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-600 mb-2" />
+                    <button type="button" id="buscar-ubicacion" class="w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700 mb-4">
+                        Buscar Ubicación
+                    </button>
+                    <div id="map" style="height: 300px;"></div>
+                    <input type="hidden" id="latitud" name="latitud">
+                    <input type="hidden" id="longitud" name="longitud">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-md hover:bg-indigo-700">
+                    Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let map, marker;
+
+        function initMap(lat = 19.4326, lng = -99.1332) {
+            map = L.map('map').setView([lat, lng], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            marker.on('dragend', function(event) {
+                const position = marker.getLatLng();
+                document.getElementById('latitud').value = position.lat;
+                document.getElementById('longitud').value = position.lng;
+            });
+        }
+
+        async function buscarUbicacion() {
+            const query = document.getElementById('ubicacion-busqueda').value;
+            if (!query) {
+                alert("Por favor ingresa una calle, ciudad o estado para buscar");
+                return;
+            }
+
+            try {
+                const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+                    params: {
+                        q: query,
+                        format: 'json',
+                        addressdetails: 1,
+                        limit: 1
+                    }
+                });
+
+                if (response.data.length > 0) {
+                    const location = response.data[0];
+                    const lat = parseFloat(location.lat);
+                    const lon = parseFloat(location.lon);
+
+                    map.setView([lat, lon], 12);
+                    marker.setLatLng([lat, lon]);
+                    document.getElementById('latitud').value = lat;
+                    document.getElementById('longitud').value = lon;
+                } else {
+                    alert("No se encontró la ubicación.");
+                }
+            } catch (error) {
+                console.error("Error al buscar la ubicación:", error);
+                alert("Hubo un error al realizar la búsqueda.");
+            }
+        }
+
+        async function guardarPerfil(event) {
+            event.preventDefault();
+
+            const userId = localStorage.getItem('userID');
+            if (!userId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const perfil = {
+                nombre: document.getElementById('nombre').value,
+                instrumento: document.getElementById('instrumento').value,
+                precio: document.getElementById('precio').value,
+                descripcion: document.getElementById('descripcion').value,
+                ubicacion: {
+                    latitud: document.getElementById('latitud').value,
+                    longitud: document.getElementById('longitud').value
+                }
+            };
+
+            try {
+                const response = await axios.put(`http://10.3.1.183:3000/api/profiles/editProfile/${userId}`, perfil);
+                alert(response.data.message);
+            } catch (error) {
+                console.error("Error al actualizar el perfil:", error);
+                alert("Hubo un error al guardar los cambios.");
+            }
+        }
+
+        window.onload = async function() {
+            const userId = localStorage.getItem('userID');
+            if (!userId) {
+                window.location.href = 'login.html';
+            }
+
+            try {
+                const response = await fetch(`http://10.3.1.183:3000/api/profiles/getProfile/${userId}`);
+                const profesor = await response.json();
+                
+                document.getElementById('nombre').value = profesor.nombre || '';
+                document.getElementById('instrumento').value = profesor.instrumento || '';
+                document.getElementById('precio').value = profesor.precio || '';
+                document.getElementById('descripcion').value = profesor.descripcion || '';
+                
+                if (profesor.ubicacion) {
+                    const lat = parseFloat(profesor.ubicacion.latitud) || 19.4326;
+                    const lng = parseFloat(profesor.ubicacion.longitud) || -99.1332;
+                    document.getElementById('latitud').value = lat;
+                    document.getElementById('longitud').value = lng;
+                    initMap(lat, lng);
+                } else {
+                    initMap();
+                }
+            } catch (error) {
+                console.error("Error al obtener los datos del profesor:", error);
+            }
+
+            document.getElementById('edit-profile-form').onsubmit = guardarPerfil;
+            document.getElementById('buscar-ubicacion').onclick = buscarUbicacion;
+        };
+    </script>
+</body>
+</html>

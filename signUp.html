@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - MusicFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 1s ease-in-out;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 2rem;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen">
+
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://media1.giphy.com/media/xTiTnnnWvRXTeXx3wc/giphy.gif'); opacity: 0.3;"></div>
+
+    <div class="bg-white animate-fade-in glass w-full max-w-lg shadow-lg relative z-10 text-black">
+        <h2 class="text-3xl font-bold text-indigo-700 text-center mb-6">Crear Cuenta</h2>
+        <form id="registerForm" method="POST">
+            <div class="mb-4">
+                <label for="name" class="block text-gray-400 font-semibold">Nombre Completo</label>
+                <input type="text" id="name" name="nombre" class="w-full p-2 border rounded-md bg-gray-500 text-white focus:outline-none focus:ring focus:ring-indigo-400" required>
+            </div>
+            <div class="mb-4">
+                <label for="email" class="block text-gray-400 font-semibold">Correo Electrónico</label>
+                <input type="email" id="email" name="correo" class="w-full p-2 border rounded-md bg-gray-500 text-white focus:outline-none focus:ring focus:ring-indigo-400" required>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block text-gray-400 font-semibold">Contraseña</label>
+                <input type="password" id="password" name="contrasena" class="w-full p-2 border rounded-md bg-gray-500 text-white focus:outline-none focus:ring focus:ring-indigo-400" required>
+            </div>
+            <div class="mb-4">
+                <label for="role" class="block text-gray-400 font-semibold">Tipo de Usuario</label>
+                <select id="role" name="tipoUsuario" class="w-full p-2 border rounded-md bg-gray-500 text-white focus:outline-none focus:ring focus:ring-indigo-400">
+                    <option value="Estudiante">Estudiante</option>
+                    <option value="Profesor">Profesor</option>
+                </select>
+            </div>
+            
+            <!-- Campos adicionales para Profesor -->
+            <div id="profesorFields" class="hidden">
+                <div class="mb-4">
+                    <label for="biografia" class="block text-gray-400 font-semibold">Biografía</label>
+                    <textarea id="biografia" name="biografia" class="w-full p-2 border rounded-md bg-gray-300 text-white focus:outline-none focus:ring focus:ring-indigo-400"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="especialidades" class="block text-gray-400 font-semibold">Especialidades (separadas por comas)</label>
+                    <input type="text" id="especialidades" name="especialidades" class="w-full p-2 border rounded-md bg-gray-500 text-white focus:outline-none focus:ring focus:ring-indigo-400">
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-md font-semibold transition duration-300">Registrarse</button>
+            </div>
+        </form>
+    </div>
+
+
+    <script>
+        document.getElementById("role").addEventListener("change", function() {
+            const profesorFields = document.getElementById("profesorFields");
+            profesorFields.style.display = this.value === "Profesor" ? "block" : "none";
+        });
+    
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+    
+            const formData = new FormData(event.target);
+            const tipoUsuario = formData.get("tipoUsuario");
+            const apiUrl= "http://10.3.1.183:3000/register";
+
+            let userData = {
+        nombre: formData.get("nombre"),
+        correo: formData.get("correo"),
+        contraseña: formData.get("contrasena"),
+        rol: formData.get("tipoUsuario") // "Estudiante" o "Profesor"
+    };
+    fetch(apiUrl, {
+        method:"POST",
+        headers:{"Content-Type": "application/json"},
+        body: JSON.stringify(userData)
+
+    })
+    .then(response=>response.json())
+    .then(data=>{
+        if (data.mensaje === "Usuario y perfil registrados exitosamente") {
+            Swal.fire({
+                icon: "success",
+                title: "¡Registro Exitoso!",
+                text: "Tu cuenta ha sido creada con éxito.",
+                showConfirmButton: false,
+                timer: 2000
+    }).then(() => {if(userData.rol==="Estudiante"){
+        window.location.href = "index.html";
+    }else if(userData.rol==="Profesor"){
+        window.location.href = "indexProfesores.html";
+    }
+                
+         });
+    }else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.mensaje
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error de conexión",
+            text: "No se pudo conectar al servidor"
+        });
+    });
+});
+    </script>
+    
+</body>
+</html>

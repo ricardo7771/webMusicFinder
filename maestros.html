@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorar Maestros - MusicFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md py-4">
+        <div class="container mx-auto flex items-center justify-between px-6">
+            <a href="index.html" class="text-2xl font-bold text-indigo-600">MusicFinder</a>
+            <ul class="flex space-x-6 text-gray-700">
+                <li><a href="index.html" class="hover:text-indigo-600">Inicio</a></li>
+                <li><a href="reservas.html" class="hover:text-indigo-600">Reservas</a></li>
+                <li><a href="pagos.html" class="hover:text-indigo-600">Pagos</a></li>
+                <li><a href="opiniones.html" class="hover:text-indigo-600">Opiniones</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Categoría de Maestros -->
+    <section class="container mx-auto px-6 py-12">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Explora Maestros por Categoría</h2>
+        <div class="flex justify-center space-x-4 mb-8">
+            <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" onclick="filtrarMaestros('Todos')">Todos</button>
+            <button class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300" onclick="filtrarMaestros('Guitarra')">Guitarra</button>
+            <button class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300" onclick="filtrarMaestros('Piano')">Piano</button>
+            <button class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300" onclick="filtrarMaestros('Violín')">Violín</button>
+        </div>
+        
+        <div id="lista-maestros" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Aquí se cargarán los maestros dinámicamente -->
+        </div>
+    </section>
+    <script>
+        let maestrosData = []; // Variable global para almacenar los datos de la API
+    
+        async function obtenerMaestros() {
+            try {
+                const response = await fetch("http://192.168.1.111:3000/professors"); // Ajusta la URL según corresponda
+                if (!response.ok) throw new Error("Error al obtener datos");
+    
+                maestrosData = await response.json(); // Almacena los datos en la variable global
+                mostrarMaestros(maestrosData);
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    
+        function mostrarMaestros(maestros) {
+            const contenedor = document.getElementById("lista-maestros");
+            contenedor.innerHTML = "";
+            maestros.forEach(m => {
+                contenedor.innerHTML += `
+                    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                        <img src="${m.imagen || 'https://via.placeholder.com/150'}" alt="Foto de ${m.nombre}" class="rounded-full w-24 h-24 mx-auto mb-4">
+                        <h3 class="text-xl font-bold text-indigo-600">${m.nombre}</h3>
+                        <p class="text-gray-700">Especialidad: ${m.instrumento}</p>
+                        <p class="text-gray-700">Calificación: ${m.rating || 'N/A'}/5</p>
+                        <p class="text-gray-700">Precio: ${m.precio}</p>
+
+                        <div class="mt-4">
+                            <a href="PerfildeProfesor.html?id=${m.id}" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Ver Perfil</a>
+                        </div>
+                    </div>`;
+            });
+        }   
+    
+        function filtrarMaestros(categoria) {
+            if (categoria === "Todos") {
+                mostrarMaestros(maestrosData);
+            } else {
+                const filtrados = maestrosData.filter(m => {
+                    if (Array.isArray(m.especialidades)) {
+                        return m.especialidades.includes(categoria);
+                    } else {
+                        return m.especialidades === categoria;
+                    }
+                });
+                mostrarMaestros(filtrados);
+            }
+        }
+    
+        // Cargar los maestros al inicio
+        obtenerMaestros();
+    </script>
+    
+    
+</body>
+</html>

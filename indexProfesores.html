@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - MusicFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Contenedor principal -->
+    <div class="min-h-screen flex flex-col">
+     <!-- Barra de navegación -->
+<nav class="bg-white shadow-md py-4">
+    <div class="flex justify-between items-center max-w-7xl mx-auto">
+        <h1 class="text-2xl font-bold text-indigo-600">MusicFinder - Profesor</h1>
+        <div class="flex items-center space-x-4">
+            <a href="editar-perfilProf.html">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 hover:text-indigo-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232a3 3 0 114.242 4.242l-8.485 8.485a3 3 0 01-1.636.818l-3.182.795a1 1 0 01-1.214-1.214l.795-3.182a3 3 0 01.818-1.636l8.485-8.485z" />
+                </svg>
+            </a>
+            <button id="logout-button" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">
+                Cerrar Sesión
+            </button>
+        </div>
+    </div>
+</nav>
+
+
+        <!-- Contenido principal -->
+        <div class="flex-grow p-8">
+            <div class="max-w-3xl mx-auto bg-indigo-300 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-indigo-600 mb-4">Bienvenido, <span id="professor-name" class="font-semibold"></span></h2>
+                
+                <!-- Opciones del panel -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="bg-indigo-50 p-6 rounded-lg shadow-md hover:shadow-xl">
+                        <h3 class="text-xl font-semibold text-indigo-700">Mis Cursos</h3>
+                        <p class="text-gray-600 mt-2">Consulta y gestiona los cursos que estás impartiendo.</p>
+                        <a href="#" class="text-indigo-600 hover:underline mt-4 block">Ver mis cursos</a>
+                    </div>
+                    <div class="bg-indigo-50 p-6 rounded-lg shadow-md hover:shadow-xl">
+                        <h3 class="text-xl font-semibold text-indigo-700">Estudiantes</h3>
+                        <p class="text-gray-600 mt-2">Accede a la lista de estudiantes que están inscritos en tus clases.</p>
+                        <a href="#" class="text-indigo-600 hover:underline mt-4 block">Ver estudiantes</a>
+                    </div>
+                    <div class="bg-indigo-50 p-6 rounded-lg shadow-md hover:shadow-xl">
+                        <h3 class="text-xl font-semibold text-indigo-700">Calendario</h3>
+                        <p class="text-gray-600 mt-2">Consulta el calendario de tus clases y eventos programados.</p>
+                        <a href="#" class="text-indigo-600 hover:underline mt-4 block">Ver calendario</a>
+                    </div>
+                    <div class="bg-indigo-50 p-6 rounded-lg shadow-md hover:shadow-xl">
+                        <h3 class="text-xl font-semibold text-indigo-700">Evaluaciones</h3>
+                        <p class="text-gray-600 mt-2">Revisa el desempeño de tus estudiantes y las evaluaciones realizadas.</p>
+                        <a href="#" class="text-indigo-600 hover:underline mt-4 block">Ver evaluaciones</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <!-- Reviews Section -->
+    <section id="reviews" class="bg-indigo-50 py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Lo Que Dicen Tus Alumnos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <p class="text-gray-700 mb-4">"Encontré al mejor profesor de guitarra gracias a MusicFinde. ¡Recomendado!"</p>
+                    <h4 class="text-indigo-600 font-bold">- María G.</h4>
+                </div>
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <p class="text-gray-700 mb-4">"La plataforma es súper intuitiva y segura. Ahora tomo clases cada semana."</p>
+                    <h4 class="text-indigo-600 font-bold">- José L.</h4>
+                </div>
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <p class="text-gray-700 mb-4">"Gracias a MusicFinde he crecido como músico. ¡Excelente experiencia!"</p>
+                    <h4 class="text-indigo-600 font-bold">- Andrea P.</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-6">
+        <div class="container mx-auto text-center text-gray-400">
+            <p>&copy; 2025 MusicFinde. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    </div>
+    
+
+    <!-- Script de manejo de sesión y cierre de sesión -->
+    <script>
+        // Verificar si el usuario está logueado
+        window.onload = async function () {
+            const profesorId = localStorage.getItem('userID');  // Obtener el ID del profesor
+
+            if (!profesorId) {
+                window.location.href = 'login.html';  // Redirigir a la página de login si no está autenticado
+            } else {
+                // Hacer la solicitud para obtener los datos del profesor desde la API
+                try {
+                    const response = await fetch(`http://10.3.1.183:3000/api/profiles/getProfile/${profesorId}`);
+                    const data = await response.json();
+
+                    if (data && data.nombre) {
+                        // Mostrar el nombre del profesor en la bienvenida
+                        const professorNameDisplay = document.getElementById('professor-name');
+                        professorNameDisplay.textContent = data.nombre;
+                    } else {
+                        console.error("No se encontró el nombre del profesor.");
+                    }
+                } catch (error) {
+                    console.error("Error al obtener los datos del profesor:", error);
+                }
+            }
+
+            // Cerrar sesión
+            const logoutButton = document.getElementById('logout-button');
+            logoutButton.addEventListener('click', function() {
+                localStorage.removeItem('userID');  // Eliminar el ID al cerrar sesión
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Has cerrado sesión!',
+                    text: 'Tu sesión ha finalizado correctamente.',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    window.location.href = 'login.html'; // Redirigir al login
+                });
+            });
+        };
+    </script>
+
+</body>
+</html>

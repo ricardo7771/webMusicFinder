@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,44 +10,42 @@
 <body class="bg-gray-50">
     <!-- Navbar -->
     <nav class="bg-white shadow-md py-4">
-        <div class="container mx-auto flex items-center justify-between px-6">
-            <a href="#" class="text-2xl font-bold text-indigo-600">MusicFinder</a>
-            <ul class="flex space-x-6 text-gray-700">
-                <li><a href="#features" class="hover:text-indigo-600">Características</a></li>
-                <li><a href="./maestros.html" class="hover:text-indigo-600">Maestros</a></li>
-                <li><a href="#reviews" class="hover:text-indigo-600">Opiniones</a></li>
-                <li><a href="./contacto.html" class="hover:text-indigo-600">Contacto</a></li>
+        <div class="container mx-auto flex items-center justify-between px-8">
+            <a href="#" class="text-2xl font-bold text-indigo-700">🎵 MusicFinder <span id="user-name" class="font-semibold"></span></a>
+            <ul class="hidden md:flex space-x-6 text-gray-700 font-medium">
+                <li><a href="./clases-estudaintes.html" class="hover:text-indigo-600 transition">Cursos</a></li>
+                <li><a href="./maestros.html" class="hover:text-indigo-600 transition">Maestros</a></li>
+                <li><a href="./misCursos_Estudiante.html" class="hover:text-indigo-600 transition">Mis Cursos</a></li>
+                <li><a href="./contacto.html" class="hover:text-indigo-600 transition">Contacto</a></li>
             </ul>
-            <div id="auth-buttons">
-                <!-- Botones que se mostrarán dependiendo del estado de autenticación -->
-            </div>
+            <div id="auth-buttons"></div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="bg-indigo-100 py-16">
-        <div class="container mx-auto text-center px-6">
-            <h1 class="text-4xl font-bold text-indigo-700 mb-4">Conecta con profesores de música cerca de ti</h1>
-            <p class="text-gray-700 mb-8">Encuentra la guía perfecta para mejorar tus habilidades musicales. Fácil, rápido y accesible.</p>
-            <a href="./maestros.html" class="px-6 py-3 bg-indigo-600 text-white text-lg rounded-md hover:bg-indigo-700">Explorar Profesores</a>
+    <section class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-20 text-center">
+        <div class="container mx-auto px-6">
+            <h1 class="text-5xl font-extrabold mb-4">Conéctate con los mejores profesores de música</h1>
+            <p class="text-lg opacity-90 mb-8">Encuentra la guía ideal para mejorar tus habilidades musicales de forma rápida y sencilla.</p>
+            <a href="./maestros.html" class="px-6 py-3 bg-white text-indigo-600 font-bold text-lg rounded-md hover:bg-gray-200 transition">Explorar Profesores</a>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-16 bg-white">
+    <section id="features" class="py-20 bg-gray-100">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Características Principales</h2>
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Características Principales</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-6 bg-gray-100 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold text-indigo-600 mb-2">Búsqueda Personalizada</h3>
+                <div class="p-6 bg-white rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">🔍 Búsqueda Personalizada</h3>
                     <p class="text-gray-700">Filtra por ubicación, especialidades y opiniones para encontrar al profesor ideal.</p>
                 </div>
-                <div class="p-6 bg-gray-100 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold text-indigo-600 mb-2">Gestión de Reservas</h3>
+                <div class="p-6 bg-white rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">📅 Gestión de Reservas</h3>
                     <p class="text-gray-700">Organiza tus clases con calendarios interactivos y recordatorios.</p>
                 </div>
-                <div class="p-6 bg-gray-100 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold text-indigo-600 mb-2">Opiniones y Calificaciones</h3>
+                <div class="p-6 bg-white rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-bold text-indigo-600 mb-2">⭐ Opiniones y Calificaciones</h3>
                     <p class="text-gray-700">Consulta reseñas de otros estudiantes antes de reservar.</p>
                 </div>
             </div>
@@ -55,57 +53,27 @@
     </section>
 
     <!-- Teachers Section -->
-    <section id="teachers" class="py-16 bg-gray-50">
+    <section id="teachers" class="py-20 bg-white">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Conoce a Nuestros Maestros</h2>
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Nuestros Maestros Destacados</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="https://via.placeholder.com/150" alt="Foto del Maestro" class="rounded-full w-24 h-24 mx-auto mb-4">
-                    <h3 class="text-xl font-bold text-indigo-600 text-center">Juan Pérez</h3>
-                    <p class="text-gray-700 text-center">Especialidad: Guitarra Clásica</p>
-                    <p class="text-gray-700 text-center">Calificación: 4.8/5</p>
-                    <div class="text-center mt-4">
-                        <a href="#" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Ver Perfil</a>
-                    </div>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+                    <img src="https://via.placeholder.com/150" alt="Juan Pérez" class="rounded-full w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-bold text-indigo-600">Juan Pérez</h3>
+                    <p class="text-gray-700">Guitarra Clásica | ⭐ 4.8/5</p>
+                    <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Ver Perfil</a>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="https://via.placeholder.com/150" alt="Foto del Maestro" class="rounded-full w-24 h-24 mx-auto mb-4">
-                    <h3 class="text-xl font-bold text-indigo-600 text-center">María López</h3>
-                    <p class="text-gray-700 text-center">Especialidad: Piano</p>
-                    <p class="text-gray-700 text-center">Calificación: 4.9/5</p>
-                    <div class="text-center mt-4">
-                        <a href="#" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Ver Perfil</a>
-                    </div>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+                    <img src="https://via.placeholder.com/150" alt="María López" class="rounded-full w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-bold text-indigo-600">María López</h3>
+                    <p class="text-gray-700">Piano | ⭐ 4.9/5</p>
+                    <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Ver Perfil</a>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <img src="https://via.placeholder.com/150" alt="Foto del Maestro" class="rounded-full w-24 h-24 mx-auto mb-4">
-                    <h3 class="text-xl font-bold text-indigo-600 text-center">Carlos Rivera</h3>
-                    <p class="text-gray-700 text-center">Especialidad: Violín</p>
-                    <p class="text-gray-700 text-center">Calificación: 4.7/5</p>
-                    <div class="text-center mt-4">
-                        <a href="#" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Ver Perfil</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Reviews Section -->
-    <section id="reviews" class="bg-indigo-50 py-16">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Lo Que Dicen Nuestros Usuarios</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-6 bg-white rounded-lg shadow-md">
-                    <p class="text-gray-700 mb-4">"Encontré al mejor profesor de guitarra gracias a MusicFinde. ¡Recomendado!"</p>
-                    <h4 class="text-indigo-600 font-bold">- María G.</h4>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md">
-                    <p class="text-gray-700 mb-4">"La plataforma es súper intuitiva y segura. Ahora tomo clases cada semana."</p>
-                    <h4 class="text-indigo-600 font-bold">- José L.</h4>
-                </div>
-                <div class="p-6 bg-white rounded-lg shadow-md">
-                    <p class="text-gray-700 mb-4">"Gracias a MusicFinde he crecido como músico. ¡Excelente experiencia!"</p>
-                    <h4 class="text-indigo-600 font-bold">- Andrea P.</h4>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+                    <img src="https://via.placeholder.com/150" alt="Carlos Rivera" class="rounded-full w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-bold text-indigo-600">Carlos Rivera</h3>
+                    <p class="text-gray-700">Violín | ⭐ 4.7/5</p>
+                    <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Ver Perfil</a>
                 </div>
             </div>
         </div>
@@ -114,33 +82,82 @@
     <!-- Footer -->
     <footer class="bg-gray-800 py-6">
         <div class="container mx-auto text-center text-gray-400">
-            <p>&copy; 2025 MusicFinde. Todos los derechos reservados.</p>
+            <p>&copy; 2025 MusicFinder. Todos los derechos reservados.</p>
         </div>
     </footer>
 
     <script>
-        // Revisamos si el usuario está autenticado (si hay un ID en el localStorage)
-        const userId = localStorage.getItem('userID');
-        const authButtons = document.getElementById('auth-buttons');
-
-        if (userId) {
-            // Si hay un ID de usuario, mostrar el botón de cerrar sesión
-            authButtons.innerHTML = `
-                <a href="#" id="logout" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Cerrar Sesión</a>
-            `;
-            document.getElementById('logout').addEventListener('click', () => {
-                // Eliminar el ID del localStorage al cerrar sesión
-                localStorage.removeItem('userID');
-                // Recargar la página para actualizar la vista
-                location.reload();
+        document.addEventListener("DOMContentLoaded", async () => {
+            const userId = localStorage.getItem('userID');
+            const authButtons = document.getElementById('auth-buttons');
+    
+            if (userId) {
+                try {
+                    const response = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${userId}`);
+                    if (!response.ok) throw new Error("Error al obtener el perfil");
+                    
+                    const data = await response.json();
+                    if (data && data.nombre) {
+                        const professorNameDisplay = document.getElementById('user-name');
+                        if (professorNameDisplay) {
+                            professorNameDisplay.textContent = data.nombre;
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error al obtener el perfil:", error);
+                }
+    
+                // Botón de cierre de sesión
+                authButtons.innerHTML = `<a href="#" id="logout" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">Cerrar Sesión</a>`;
+                document.getElementById('logout').addEventListener('click', () => {
+                    localStorage.removeItem('userID');
+                    location.reload();
+                });
+            } else {
+                authButtons.innerHTML = `
+                    <a href="login.html" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Iniciar Sesión</a>
+                    <a href="signUp.html" class="ml-2 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-600 hover:text-white transition">Registrarse</a>
+                `;
+            }
+    
+            // Proteger acceso a páginas sin login
+            const protectedLinks = document.querySelectorAll("a[href='./clases-estudaintes.html'], a[href='./maestros.html']");
+            protectedLinks.forEach(link => {
+                link.addEventListener("click", (event) => {
+                    if (!userId) {
+                        event.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Acceso restringido',
+                            text: 'Debes iniciar sesión para acceder a esta sección.',
+                            confirmButtonText: 'Iniciar Sesión'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'login.html';
+                            }
+                        });
+                    }
+                });
             });
-        } else {
-            // Si no hay ID de usuario, mostrar los botones de iniciar sesión y registrarse
-            authButtons.innerHTML = `
-                <a href="login.html" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Iniciar Sesión</a>
-                <a href="signUp.html" class="ml-2 px-4 py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-600 hover:text-white">Registrarse</a>
-            `;
-        }
+    
+            // Redirección automática en páginas protegidas
+            const restrictedPages = ["clases-estudaintes.html", "maestros.html"];
+            restrictedPages.forEach(page => {
+                if (window.location.pathname.includes(page) && !userId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Acceso denegado',
+                        text: 'Debes iniciar sesión para ver esta página.',
+                        confirmButtonText: 'Ir al login'
+                    }).then(() => {
+                        window.location.href = 'login.html';
+                    });
+                }
+            });
+        });
     </script>
+    
+    
+    
 </body>
 </html>

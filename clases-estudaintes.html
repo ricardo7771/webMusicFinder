@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clases Disponibles</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md py-4">
+        <div class="container mx-auto flex items-center justify-between px-8">
+            <a href="./index.html" class="text-2xl font-bold text-indigo-700">🎵 MusicFinder <span id="user-name" class="font-semibold"></span></a>
+            <ul class="hidden md:flex space-x-6 text-gray-700 font-medium">
+                <li><a href="./clases-estudaintes.html" class="hover:text-indigo-600 transition">Cursos</a></li>
+                <li><a href="./maestros.html" class="hover:text-indigo-600 transition">Maestros</a></li>
+                <li><a href="./misCursos_Estudiante.html" class="hover:text-indigo-600 transition">Mis Cursos</a></li>
+                <li><a href="./contacto.html" class="hover:text-indigo-600 transition">Contacto</a></li>
+            </ul>
+            <div id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <section class="container mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold text-indigo-700 text-center">Clases Disponibles</h1>
+        <div class="mt-4 text-center">
+            <label for="fecha" class="block text-gray-700">Selecciona una fecha:</label>
+            <input type="date" id="fecha" class="mt-2 p-2 border rounded-md">
+            <button onclick="cargarClases()" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Buscar</button>
+        </div>
+        <div id="clases" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const hoy = new Date();
+            hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset()); // Ajustar zona horaria
+            const fechaLocal = hoy.toISOString().split("T")[0];
+            document.getElementById('fecha').value = fechaLocal;
+            cargarClases();
+        });
+
+        async function cargarClases() {
+            const fecha = document.getElementById('fecha').value;
+            if (!fecha) {
+                Swal.fire('Error', 'Selecciona una fecha', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://192.168.1.111:3000/reservas/${fecha}`);
+                const data = await response.json();
+
+                const clasesDiv = document.getElementById('clases');
+                clasesDiv.innerHTML = '';
+
+                if (response.status === 404 || data.length === 0) {
+                    clasesDiv.innerHTML = '<p class="text-gray-600 text-center">No hay clases disponibles para esta fecha.</p>';
+                    return;
+                }
+
+                for (const clase of data) {
+                    const profesorNombre = await obtenerNombreProfesor(clase.profesor); 
+                    const puedeReservar = verificarDisponibilidad(fecha, clase.hora); 
+
+                    const claseHTML = `
+                        <div class="p-4 bg-gray-100 rounded-md shadow">
+                            <h2 class="text-lg font-bold text-indigo-600">${clase.clase}</h2>
+                            <p class="text-gray-700">Profesor: ${profesorNombre}</p>
+                            <p class="text-gray-700">Hora: ${clase.hora}</p>
+                            ${puedeReservar ? `
+                              <button onclick="redirigirPago('${clase.fecha}', '${clase.hora}')" 
+    class="mt-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+    💳 Pagar Clase
+</button>
+` 
+                                : `<p class="text-red-500 mt-2">Esta clase ya no está disponible para reservar.</p>`}
+                        </div>
+                    `;
+                    clasesDiv.innerHTML += claseHTML;
+                }
+            } catch (error) {
+                Swal.fire('Error', 'No se pudieron cargar las clases', 'error');
+            }
+        }
+
+        async function obtenerNombreProfesor(profesorId) {
+            try {
+                const response = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${profesorId}`);
+                if (!response.ok) throw new Error("No se pudo obtener el perfil");
+                const data = await response.json();
+                return data.nombre || "Profesor desconocido";
+            } catch (error) {
+                console.error("Error obteniendo el nombre del profesor:", error);
+                return "Profesor desconocido";
+            }
+        }
+
+        function verificarDisponibilidad(fechaClase, horaClase) {
+            const fechaActual = new Date();
+            const fechaClaseObj = new Date(`${fechaClase}T${horaClase}`);
+            return fechaClaseObj > fechaActual; 
+        }
+
+        function redirigirPago(fecha, hora) {
+            window.location.href = `pagos.html?clase=${fecha}&hora=${hora}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Clases Asignadas</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md py-4">
+        <div class="container mx-auto flex items-center justify-between px-8">
+            <a href="./index.html" class="text-2xl font-bold text-indigo-700">🎵 MusicFinder <span id="user-name" class="font-semibold"></span></a>
+            <ul class="hidden md:flex space-x-6 text-gray-700 font-medium">
+                <li><a href="./clases-estudaintes.html" class="hover:text-indigo-600 transition">Cursos</a></li>
+                <li><a href="./maestros.html" class="hover:text-indigo-600 transition">Maestros</a></li>
+                <li><a href="./misCursos_Estudiante.html" class="hover:text-indigo-600 transition">Mis Cursos</a></li>
+                <li><a href="./contacto.html" class="hover:text-indigo-600 transition">Contacto</a></li>
+            </ul>
+            <div id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <section class="container mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold text-indigo-700 text-center">Mis Clases Asignadas</h1>
+
+        <!-- Campo para seleccionar la fecha -->
+        <div class="mt-6 flex items-center justify-center">
+            <input type="date" id="fecha-buscar" class="px-4 py-2 border border-gray-300 rounded-md" />
+            <button id="btn-buscar" class="ml-4 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                Buscar Clases
+            </button>
+        </div>
+
+        <!-- Mostrar las clases asignadas -->
+        <div id="clases-asignadas" class="mt-6 space-y-4">
+            <!-- Aquí se mostrarán las clases asignadas -->
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const estudianteId = localStorage.getItem("userID");
+
+            if (!estudianteId) {
+                Swal.fire('Error', 'No se ha encontrado el ID del estudiante.', 'error');
+                return;
+            }
+
+            // Función para obtener y mostrar clases asignadas para una fecha
+            const mostrarClases = async (fecha) => {
+    
+                try {
+                    // Obtener las reservas para la fecha seleccionada
+                    const response = await fetch(`http://192.168.1.111:3000/reservas/${fecha}`);
+                    const reservas = await response.json();
+
+                    // Filtrar las clases asignadas al estudiante
+                    const clasesAsignadas = reservas.filter(reserva => reserva.alumno === estudianteId);
+
+                    if (clasesAsignadas.length === 0) {
+                        Swal.fire('Información', 'No tienes clases asignadas para este día.', 'info');
+                        return;
+                    }
+
+                    // Mostrar las clases asignadas
+                    const clasesContainer = document.getElementById("clases-asignadas");
+            
+                    clasesContainer.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevas clases
+
+// Recorrer cada clase y obtener el nombre del profesor
+for (const clase of clasesAsignadas) {
+    const profesornombre = await obtenerNombreProfesor(clase.profesor);  // Obtener el nombre del profesor
+
+    clasesContainer.innerHTML += `
+        <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+            <p class="text-gray-700"><strong>Clase:</strong> ${clase.clase}</p>
+            <p class="text-gray-700"><strong>Profesor:</strong> ${profesornombre}</p>
+            <p class="text-gray-700"><strong>Hora:</strong> ${clase.hora}</p>
+        </div>
+    `;
+}
+                } catch (error) {
+                    Swal.fire('Error', 'No se pudo cargar las clases asignadas.', 'error');
+                }
+            };
+            async function obtenerNombreProfesor(profesorId) {
+            try {
+                const response = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${profesorId}`);
+                if (!response.ok) throw new Error("No se pudo obtener el perfil");
+                const data = await response.json();
+                return data.nombre || "Profesor desconocido";
+            } catch (error) {
+                console.error("Error obteniendo el nombre del profesor:", error);
+                return "Profesor desconocido";
+            }
+        }
+
+            // Evento para el botón de búsqueda
+            document.getElementById("btn-buscar").addEventListener("click", () => {
+                const fechaSeleccionada = document.getElementById("fecha-buscar").value;
+
+                if (!fechaSeleccionada) {
+                    Swal.fire('Error', 'Por favor selecciona una fecha.', 'error');
+                    return;
+                }
+
+                mostrarClases(fechaSeleccionada);
+            });
+
+            // Buscar clases para la fecha actual por defecto
+            const today = new Date();
+            const fechaHoy = today.toISOString().split('T')[0];  // Formato: "YYYY-MM-DD"
+            mostrarClases(fechaHoy); // Mostrar clases del día actual
+        });
+    </script>
+</body>
+</html>

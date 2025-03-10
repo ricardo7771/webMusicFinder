@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago de Clase</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md py-4">
+        <div class="container mx-auto flex items-center justify-between px-8">
+            <a href="./index.html" class="text-2xl font-bold text-indigo-700">🎵 MusicFinder <span id="user-name" class="font-semibold"></span></a>
+            <ul class="hidden md:flex space-x-6 text-gray-700 font-medium">
+                <li><a href="./clases-estudaintes.html" class="hover:text-indigo-600 transition">Cursos</a></li>
+                <li><a href="./maestros.html" class="hover:text-indigo-600 transition">Maestros</a></li>
+                <li><a href="./misCursos_Estudiante.html" class="hover:text-indigo-600 transition">Mis Cursos</a></li>
+                <li><a href="./contacto.html" class="hover:text-indigo-600 transition">Contacto</a></li>
+            </ul>
+            <div id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <section class="container mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold text-indigo-700 text-center">Pago de Clase</h1>
+        <div id="detalle-clase" class="mt-6 text-center"></div>
+        <button id="btn-pagar" class="mt-4 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition disabled:bg-gray-400" disabled>💳 Confirmar Pago</button>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fecha = urlParams.get("clase");
+            const hora = urlParams.get("hora");
+            const estudianteId = localStorage.getItem("userID");
+
+            if (!fecha || !hora || !estudianteId) {
+                Swal.fire('Error', 'Información no válida.', 'error');
+                return;
+            }
+
+            try {
+                // Obtener la reserva usando tanto la fecha como la hora
+                const response = await fetch(`http://192.168.1.111:3000/reservas/${fecha}`);
+                const reservas = await response.json();
+
+                // Buscar la clase específica dentro de las reservas por la hora
+                const clase = reservas.find(reserva => reserva.hora === hora);
+
+                if (!clase) {
+                    Swal.fire('Error', 'No se encontró la clase para la fecha y hora proporcionadas.', 'error');
+                    return;
+                }
+
+                // Obtener el nombre del profesor usando el ID del profesor
+                const profesorResponse = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${clase.profesor}`);
+                const profesor = await profesorResponse.json();
+
+                if (!profesor || !profesor.nombre) {
+                    Swal.fire('Error', 'No se pudo obtener el nombre del profesor.', 'error');
+                    return;
+                }
+
+                // Mostrar los detalles de la clase con el nombre del profesor
+                document.getElementById("detalle-clase").innerHTML = `
+                    <p class='text-gray-700'><strong>Clase:</strong> ${clase.clase}</p>
+                    <p class='text-gray-700'><strong>Profesor:</strong> ${profesor.nombre}</p>
+                    <p class='text-gray-700'><strong>Hora:</strong> ${clase.hora}</p>
+                    <p class='text-gray-700'><strong>Precio:</strong> $${clase.precio}</p>
+                    
+                `;
+
+                // Si la clase ya tiene un estudiante asignado, deshabilitar el botón de pago
+                if (clase.alumno) {
+                    document.getElementById("btn-pagar").disabled = true;
+                    document.getElementById("btn-pagar").textContent = "Clase ya reservada";
+                }
+            } catch (error) {
+                Swal.fire('Error', 'No se pudo cargar la clase.', 'error');
+            }
+
+            document.getElementById("btn-pagar").addEventListener("click", async () => {
+                try {
+                    // Verificamos que la clase no tenga ya un estudiante asignado
+                    const response = await fetch(`http://192.168.1.111:3000/reservas/${fecha}`);
+                    const reservas = await response.json();
+                    const clase = reservas.find(reserva => reserva.hora === hora);
+
+                    if (clase.alumno) {
+                        Swal.fire('Error', 'Esta clase ya está reservada por otro estudiante.', 'error');
+                        return;
+                    }
+
+                    // Realizamos el pago y asignamos el estudiante a la clase
+                    const res = await fetch(`http://192.168.1.111:3000/reservas/${fecha}/${hora}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            alumno: estudianteId,  // Asignar el alumno
+                            profesor: clase.profesor,  // Mantener el profesor
+                            clase: clase.clase,  // Mantener la clase
+                            hora: clase.hora,  // Mantener la hora
+                            precio: clase.precio  // Mantener el precio
+                        })
+                    });
+
+                    const data = await res.json();
+                    Swal.fire('Éxito', data.message, 'success').then(() => {
+                        window.location.href = "index.html";
+                    });
+                } catch (error) {
+                    Swal.fire('Error', 'No se pudo procesar el pago.', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

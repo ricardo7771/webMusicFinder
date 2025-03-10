@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario con API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-white text-black">
+    <nav class="bg-white shadow-md py-4 mb-6">
+        <div class="flex justify-between items-center max-w-7xl mx-auto px-4">
+            <h1 class="text-2xl font-bold text-indigo-600">MusicFinder - Profesor</h1>
+            <div class="flex items-center space-x-4">
+                <a href="indexprofesores.html" class="text-indigo-600 hover:text-indigo-800 font-semibold">Regresar</a>
+                <button id="logout-button" class="bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700">Cerrar Sesión</button>
+            </div>
+        </div>
+    </nav><div class="container mx-auto p-10">
+    <div class="flex justify-between items-center mb-4">
+        <button onclick="prevMonth()" class="bg-blue-500 text-white px-4 py-2 rounded">Anterior</button>
+        <div id="month-year" class="text-xl font-bold"></div>
+        <button onclick="nextMonth()" class="bg-blue-500 text-white px-4 py-2 rounded">Siguiente</button>
+    </div>
+    <div class="grid grid-cols-7 text-center font-bold">
+        <div>Lunes</div><div>Martes</div><div>Miércoles</div><div>Jueves</div><div>Viernes</div><div>Sábado</div><div>Domingo</div>
+    </div>
+    <div class="grid grid-cols-7 gap-4 mt-4" id="calendar"></div>
+
+    <div class="mt-10">
+        <h2 class="text-2xl mb-4">Reservas</h2>
+        <ul id="pending-notes" class="list-disc ml-5 mb-4"></ul>
+        <button onclick="openNoteInput()" class="bg-blue-500 text-white px-4 py-2 rounded">Agregar Reserva</button>
+    </div>
+</div>
+
+<div id="note-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded shadow-lg w-1/3">
+        <h2 class="text-xl mb-4">Agregar/Editar Reserva</h2>
+        <input type="text" id="modal-note" class="w-full p-2 border rounded mb-4" placeholder="Clase...">
+           <!-- Selector de hora -->
+           <select id="modal-hour" class="w-full p-2 border rounded mb-4">
+            <option value="">Selecciona una hora</option>
+            <option value="08:00">08:00</option>
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="11:00">11:00</option>
+            <option value="12:00">12:00</option>
+            <option value="13:00">13:00</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+            <option value="17:00">17:00</option>
+        </select>
+        <div class="flex justify-end">
+            <button onclick="saveModalNote()" class="bg-green-500 text-white px-4 py-2 rounded mr-2">Guardar</button>
+            <button onclick="closeModal()" class="bg-red-500 text-white px-4 py-2 rounded">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    const API_URL = "http://192.168.1.111:3000/reservas";
+    const calendar = document.getElementById('calendar');
+    const pendingNotes = document.getElementById('pending-notes');
+    const monthYear = document.getElementById('month-year');
+    let selectedDate = null;
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let editingNote = { date: null, hora: null };
+
+    function renderCalendar(month, year) {
+        calendar.innerHTML = '';
+        monthYear.textContent = new Date(year, month).toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let start = firstDay === 0 ? 6 : firstDay - 1;
+        for (let i = 0; i < start; i++) {
+            calendar.innerHTML += '<div></div>';
+        }
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day).toISOString().split('T')[0];
+            const dayElement = document.createElement('div');
+            dayElement.className = `p-6 border rounded cursor-pointer text-center bg-blue-300 hover:bg-blue-400`;
+            dayElement.textContent = day;
+            dayElement.onclick = () => selectDate(date);
+            calendar.appendChild(dayElement);
+        }
+    }
+
+    async function selectDate(date) {
+        selectedDate = date;
+        showNotes(date);
+    }
+
+    async function showNotes(date) {
+    pendingNotes.innerHTML = '';
+    try {
+        const profesorId = localStorage.getItem('userID'); // Obtener el ID del profesor logueado
+        if (!profesorId) {
+            console.log("No se encontró el ID del profesor.");
+            pendingNotes.innerHTML = '<li>No hay reservas</li>';
+            return;
+        }
+
+        const response = await fetch(`${API_URL}/${date}`);
+        if (!response.ok) throw new Error('No hay reservas');
+        const reservas = await response.json();
+
+        // Filtrar reservas solo del profesor logueado
+        const reservasProfesor = reservas.filter(reserva => reserva.profesor === profesorId);
+
+        if (reservasProfesor.length === 0) {
+            pendingNotes.innerHTML = '<li>No hay reservas para este profesor</li>';
+            return;
+        }
+
+        reservasProfesor.forEach((reserva) => {
+            const li = document.createElement('li');
+            li.classList.add("mb-2");
+            li.innerHTML = `${reserva.hora} - ${reserva.clase} 
+                <button onclick="editModal('${date}', '${reserva.hora}')" class="bg-yellow-500 text-white px-2 py-1 rounded ml-2">Editar</button> 
+                <button onclick="deleteNote('${date}', '${reserva.hora}')" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Eliminar</button>`;
+            pendingNotes.appendChild(li);
+        });
+    } catch (error) {
+        console.log(error);
+        pendingNotes.innerHTML = '<li>No hay reservas</li>';
+    }
+}
+
+
+function openNoteInput() {
+    const today = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
+
+    if (selectedDate < today) { // Verificar si la fecha seleccionada es anterior a hoy
+        Swal.fire({
+            icon: 'error',
+            title: 'Fecha inválida',
+            text: 'No puedes agregar reservas en fechas pasadas.'
+        });
+        return;
+    }
+
+    document.getElementById('note-modal').classList.remove('hidden');
+    document.getElementById('modal-note').value = '';
+    editingNote = { date: selectedDate, hora: null };
+}
+
+
+    function closeModal() {
+        document.getElementById('note-modal').classList.add('hidden');
+    }
+    async function saveModalNote() {
+        const note = document.getElementById('modal-note').value.trim();
+        const hour = document.getElementById('modal-hour').value.trim();
+        if (!note) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No puedes dejar el campo vacío.' });
+            return;
+        }
+
+        const profesorId = localStorage.getItem('userID'); // Obtenemos el ID del profesor desde localStorage
+        if (!profesorId) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo obtener el ID del profesor.' });
+            return;
+        }
+
+        const nuevaReserva = {
+            fecha: selectedDate,
+            hora: hour, // Puedes agregar un selector de hora
+            profesor: profesorId,  // Usamos el ID del profesor
+            alumno: "",  // Inicialmente vacío hasta que se seleccione un estudiante
+            clase: note
+        };
+
+        try {
+            if (editingNote.hora) {
+                await fetch(`${API_URL}/${selectedDate}/${editingNote.hora}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevaReserva)
+                });
+            } else {
+                await fetch(`${API_URL}/${selectedDate}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevaReserva)
+                });
+            }
+            Swal.fire({ icon: 'success', title: 'Reserva guardada', text: 'Reserva añadida con éxito.' });
+            closeModal();
+            showNotes(selectedDate);
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo agregar la reserva.' });
+        }
+    }
+
+    async function deleteNote(date, hora) {
+    const confirmation = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar'
+    });
+
+    if (confirmation.isConfirmed) {
+        try {
+            await fetch(`${API_URL}/${date}/${hora}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            Swal.fire({
+                icon: 'success',
+                title: '¡Eliminado!',
+                text: 'La reserva ha sido eliminada con éxito.'
+            });
+            showNotes(date); // Actualizar las notas después de eliminar
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo eliminar la reserva.'
+            });
+        }
+    }
+}
+
+
+
+    function editModal(date, hora) {
+        document.getElementById('note-modal').classList.remove('hidden');
+        editingNote = { date, hora };
+    }
+
+    function prevMonth() {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentMonth, currentYear);
+    }
+
+    function nextMonth() {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentMonth, currentYear);
+    }
+
+    renderCalendar(currentMonth, currentYear);
+</script>
+</body>
+</html>

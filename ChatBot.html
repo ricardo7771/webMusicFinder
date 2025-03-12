@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot MusicFinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body class="flex justify-center items-center h-screen bg-gray-900">
+
+    <div class="p-4 bg-gray-800 text-white rounded-xl w-80">
+        <h2 class="text-lg font-bold mb-2">🎵 MusicFinder Chat</h2>
+        <div id="chat-box" class="h-40 overflow-y-auto bg-gray-700 p-2 rounded-md"></div>
+        <input id="message" type="text" class="mt-2 p-2 w-full rounded bg-gray-600 text-white" placeholder="Escribe un mensaje...">
+        <button id="send" class="mt-2 p-2 bg-blue-500 rounded w-full">Enviar</button>
+    </div>
+
+    <script src="chatbot.js"></script>
+</body>
+</html>

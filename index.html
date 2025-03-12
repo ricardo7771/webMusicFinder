@@ -157,7 +157,26 @@
         });
     </script>
     
-    
+    <!-- Chatbot -->
+<div id="chatbot-container" class="fixed bottom-5 right-5 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-4 w-72">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg font-bold text-indigo-600">💬 Chatbot</h3>
+            <button id="close-chatbot" class="text-red-500 text-lg font-bold">×</button>
+        </div>
+        <div id="chat-box" class="h-40 overflow-y-auto bg-gray-100 p-2 rounded-md mt-2"></div>
+        <input id="message" type="text" class="mt-2 p-2 w-full rounded border" placeholder="Escribe un mensaje...">
+        <button id="send" class="mt-2 p-2 bg-indigo-500 text-white rounded w-full">Enviar</button>
+    </div>
+</div>
+
+<button id="open-chatbot" class="fixed bottom-5 right-5 bg-indigo-600 text-white p-3 rounded-full shadow-lg border-2 border-gray-300">
+    💬
+</button>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="chatbot.js"></script>
+
     
 </body>
 </html>

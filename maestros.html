@@ -57,7 +57,7 @@
 
         async function obtenerMaestros() {
             try {
-                const response = await fetch("http://192.168.1.111:3000/professors"); // Ajusta la URL según corresponda
+                const response = await fetch("https://musicfinderapi-amwf.onrender.com/professors"); // Ajusta la URL según corresponda
                 if (!response.ok) throw new Error("Error al obtener datos");
 
                 maestrosData = await response.json(); 

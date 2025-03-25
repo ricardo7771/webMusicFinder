@@ -6,6 +6,7 @@
     <title>Pago de Clase</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AZ718gCL4Bzu260AaOjuYxtLCBsmT-oUIb2mpWXdatxzZXFXncJuBZ4yflMzVUuF7XOleTt7_7U84MqP&currency=MXN"></script>
 </head>
 <body class="bg-gray-50">
     <nav class="bg-white shadow-md py-4">
@@ -24,7 +25,7 @@
     <section class="container mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
         <h1 class="text-2xl font-bold text-indigo-700 text-center">Pago de Clase</h1>
         <div id="detalle-clase" class="mt-6 text-center"></div>
-        <button id="btn-pagar" class="mt-4 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition disabled:bg-gray-400" disabled>💳 Confirmar Pago</button>
+        <div id="paypal-button-container" class="mt-6 flex justify-center"></div>
     </section>
 
     <script>
@@ -40,20 +41,16 @@
             }
 
             try {
-                // Obtener la reserva usando tanto la fecha como la hora
-                const response = await fetch(`http://192.168.1.111:3000/reservas/${fecha}`);
+                const response = await fetch(`https://musicfinderapi-amwf.onrender.com/reservas/${fecha}`);
                 const reservas = await response.json();
 
-                // Buscar la clase específica dentro de las reservas por la hora
                 const clase = reservas.find(reserva => reserva.hora === hora);
-
                 if (!clase) {
                     Swal.fire('Error', 'No se encontró la clase para la fecha y hora proporcionadas.', 'error');
                     return;
                 }
 
-                // Obtener el nombre del profesor usando el ID del profesor
-                const profesorResponse = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${clase.profesor}`);
+                const profesorResponse = await fetch(`https://musicfinderapi-amwf.onrender.com/api/profiles/getProfile/${clase.profesor}`);
                 const profesor = await profesorResponse.json();
 
                 if (!profesor || !profesor.nombre) {
@@ -61,57 +58,55 @@
                     return;
                 }
 
-                // Mostrar los detalles de la clase con el nombre del profesor
                 document.getElementById("detalle-clase").innerHTML = `
                     <p class='text-gray-700'><strong>Clase:</strong> ${clase.clase}</p>
                     <p class='text-gray-700'><strong>Profesor:</strong> ${profesor.nombre}</p>
                     <p class='text-gray-700'><strong>Hora:</strong> ${clase.hora}</p>
                     <p class='text-gray-700'><strong>Precio:</strong> $${clase.precio}</p>
-                    
                 `;
 
-                // Si la clase ya tiene un estudiante asignado, deshabilitar el botón de pago
-                if (clase.alumno) {
-                    document.getElementById("btn-pagar").disabled = true;
-                    document.getElementById("btn-pagar").textContent = "Clase ya reservada";
-                }
+                // Integrar botón de PayPal
+                paypal.Buttons({
+                    createOrder: async (data, actions) => {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: "1.00" // Precio de la clase
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: async (data, actions) => {
+                        const order = await actions.order.capture();
+                        console.log("Pago exitoso:", order);
+
+                        // Actualizar base de datos con la reserva confirmada
+                        await fetch(`https://musicfinderapi-amwf.onrender.com/reservas/${fecha}/${hora}`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                alumno: estudianteId,
+                                profesor: clase.profesor,
+                                clase: clase.clase,
+                                hora: clase.hora,
+                                precio: clase.precio,
+                                pagoConfirmado: true
+                            })
+                        });
+
+                        Swal.fire('Éxito', 'Pago realizado correctamente.', 'success').then(() => {
+                            window.location.href = "index.html";
+                        });
+                    },
+                    onError: (err) => {
+                        Swal.fire('Error', 'Hubo un problema con el pago.', 'error');
+                        console.error("Error en el pago:", err);
+                    }
+                }).render("#paypal-button-container");
+
             } catch (error) {
                 Swal.fire('Error', 'No se pudo cargar la clase.', 'error');
             }
-
-            document.getElementById("btn-pagar").addEventListener("click", async () => {
-                try {
-                    // Verificamos que la clase no tenga ya un estudiante asignado
-                    const response = await fetch(`http://192.168.1.111:3000/reservas/${fecha}`);
-                    const reservas = await response.json();
-                    const clase = reservas.find(reserva => reserva.hora === hora);
-
-                    if (clase.alumno) {
-                        Swal.fire('Error', 'Esta clase ya está reservada por otro estudiante.', 'error');
-                        return;
-                    }
-
-                    // Realizamos el pago y asignamos el estudiante a la clase
-                    const res = await fetch(`http://192.168.1.111:3000/reservas/${fecha}/${hora}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            alumno: estudianteId,  // Asignar el alumno
-                            profesor: clase.profesor,  // Mantener el profesor
-                            clase: clase.clase,  // Mantener la clase
-                            hora: clase.hora,  // Mantener la hora
-                            precio: clase.precio  // Mantener el precio
-                        })
-                    });
-
-                    const data = await res.json();
-                    Swal.fire('Éxito', data.message, 'success').then(() => {
-                        window.location.href = "index.html";
-                    });
-                } catch (error) {
-                    Swal.fire('Error', 'No se pudo procesar el pago.', 'error');
-                }
-            });
         });
     </script>
 </body>

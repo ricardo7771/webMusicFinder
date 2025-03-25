@@ -16,7 +16,6 @@
                 <li><a href="./clases-estudaintes.html" class="hover:text-indigo-600 transition">Cursos</a></li>
                 <li><a href="./maestros.html" class="hover:text-indigo-600 transition">Maestros</a></li>
                 <li><a href="./misCursos_Estudiante.html" class="hover:text-indigo-600 transition">Mis Cursos</a></li>
-                <li><a href="./contacto.html" class="hover:text-indigo-600 transition">Contacto</a></li>
             </ul>
             <div id="auth-buttons"></div>
         </div>
@@ -58,19 +57,19 @@
             <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Nuestros Maestros Destacados</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
-                    <img src="https://via.placeholder.com/150" alt="Juan Pérez" class="rounded-full w-24 h-24 mx-auto mb-4">
+                    <img src="https://picsum.photos/150" alt="Juan Pérez" class="rounded-full w-24 h-24 mx-auto mb-4">
                     <h3 class="text-xl font-bold text-indigo-600">Juan Pérez</h3>
                     <p class="text-gray-700">Guitarra Clásica | ⭐ 4.8/5</p>
                     <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Ver Perfil</a>
                 </div>
                 <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
-                    <img src="https://via.placeholder.com/150" alt="María López" class="rounded-full w-24 h-24 mx-auto mb-4">
+                    <img src="https://picsum.photos/150" alt="María López" class="rounded-full w-24 h-24 mx-auto mb-4">
                     <h3 class="text-xl font-bold text-indigo-600">María López</h3>
                     <p class="text-gray-700">Piano | ⭐ 4.9/5</p>
                     <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Ver Perfil</a>
                 </div>
                 <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
-                    <img src="https://via.placeholder.com/150" alt="Carlos Rivera" class="rounded-full w-24 h-24 mx-auto mb-4">
+                    <img src="https://picsum.photos/150" alt="Carlos Rivera" class="rounded-full w-24 h-24 mx-auto mb-4">
                     <h3 class="text-xl font-bold text-indigo-600">Carlos Rivera</h3>
                     <p class="text-gray-700">Violín | ⭐ 4.7/5</p>
                     <a href="#" class="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Ver Perfil</a>
@@ -93,7 +92,7 @@
     
             if (userId) {
                 try {
-                    const response = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${userId}`);
+                    const response = await fetch(`https://musicfinderapi-amwf.onrender.com/api/profiles/getProfile/${userId}`);
                     if (!response.ok) throw new Error("Error al obtener el perfil");
                     
                     const data = await response.json();

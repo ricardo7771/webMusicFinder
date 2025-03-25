@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel del Profesor - MusicFinder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+</head>
+
+<body class="bg-gray-50">
+  <nav class="bg-white shadow-md py-4">
+    <div class="container mx-auto flex items-center justify-between px-8">
+      <a href="./indexProfesores.html" class="text-2xl font-bold text-indigo-700">🎵 MusicFinder - Profesor</a>
+      <button id="logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <div class="container mx-auto mt-8 px-4">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">👨‍🏫 Panel del Profesor</h1>
+
+    <div class="flex flex-col md:flex-row gap-6">
+      <div class="w-full md:w-1/3 bg-white shadow-lg rounded-lg p-4">
+        <h2 class="text-xl font-semibold mb-4">💬 Mis Chats</h2>
+        <ul id="lista-chats" class="space-y-2"></ul>
+      </div>
+
+      <div class="w-full md:w-2/3 bg-white shadow-lg rounded-lg p-4">
+        <h2 class="text-xl font-semibold mb-4">📝 Chat con el Alumno</h2>
+        <div id="chat-container" class="h-96 bg-gray-100 p-4 rounded overflow-y-auto mb-4"></div>
+
+        <div class="flex items-center space-x-2">
+          <input id="message-input" type="text" placeholder="Escribe un mensaje..." class="w-full border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500" />
+          <button onclick="enviarMensaje()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const socket = io("https://musicfinderapi-amwf.onrender.com");
+    const profesorId = localStorage.getItem("profesorId");
+
+if (!profesorId) {
+  console.error("No se encontró el ID del profesor en localStorage.");
+  alert("Error: No estás autenticado como profesor.");
+  window.location.href = "./index.html"; // Redirige al login si es necesario
+} else {
+  obtenerReservasProfesor();
+}
+    let alumnoSeleccionado = null;
+  
+    function obtenerReservasProfesor() {
+      fetch(`https://musicfinderapi-amwf.onrender.com/reservas/profesor/${profesorId}`)
+        .then(response => response.json())
+        .then(data => {
+          mostrarListaChats(data);
+        })
+        .catch(error => console.error("Error al obtener reservas:", error));
+    }
+  
+    function mostrarListaChats(reservas) {
+      const lista = document.getElementById("lista-chats");
+      lista.innerHTML = "";
+  
+      if (!reservas.length) {
+        lista.innerHTML = `<p class="text-gray-500">No tienes alumnos con reservas.</p>`;
+        return;
+      }
+  
+      const alumnosUnicos = {};
+      reservas.forEach(reserva => {
+        if (!alumnosUnicos[reserva.alumno]) {
+          alumnosUnicos[reserva.alumno] = reserva.alumno;
+        }
+      });
+  
+      Object.keys(alumnosUnicos).forEach((alumnoId) => {
+        lista.innerHTML += `
+          <li onclick="seleccionarAlumno('${alumnoId}')" class="p-2 bg-gray-100 hover:bg-indigo-100 rounded cursor-pointer">
+            🎓 Alumno ID: ${alumnoId}
+          </li>`;
+      });
+    }
+  
+    function seleccionarAlumno(alumnoId) {
+      alumnoSeleccionado = alumnoId;
+      document.getElementById("chat-container").innerHTML = `<p class="text-gray-500">📢 Chateando con Alumno ID: ${alumnoId}</p>`;
+    }
+  
+    function enviarMensaje() {
+      const mensaje = document.getElementById("message-input").value.trim();
+      if (mensaje && alumnoSeleccionado) {
+        socket.emit("sendMessage", { profesorId, alumnoId: alumnoSeleccionado, message: mensaje, sender: "profesor" });
+        mostrarMensaje(`👨‍🏫 Tú`, mensaje);
+        document.getElementById("message-input").value = "";
+      }
+    }
+  
+    function mostrarMensaje(usuario, mensaje) {
+      const contenedorChat = document.getElementById("chat-container");
+      contenedorChat.innerHTML += `<div class="mb-2"><strong>${usuario}:</strong> ${mensaje}</div>`;
+      contenedorChat.scrollTop = contenedorChat.scrollHeight;
+    }
+  
+    socket.on("message", ({ user, message }) => {
+      mostrarMensaje(user, message);
+    });
+  
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.removeItem("profesorId");
+      window.location.href = "./index.html";
+    });
+  
+    // Cargar los alumnos con reservas al cargar la página
+    obtenerReservasProfesor();
+  </script>
+  
+</body>
+
+</html>

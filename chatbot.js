@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const socket = io("http://192.168.1.111:3000"); // Conectar con el backend de Socket.io
+    const socket = io("https://musicfinderapi-amwf.onrender.com"); // Conectar con el backend de Socket.io
     const chatBox = document.getElementById("chat-box");
     const inputMessage = document.getElementById("message");
     const sendButton = document.getElementById("send");

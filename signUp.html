@@ -80,7 +80,7 @@
     
             const formData = new FormData(event.target);
             const tipoUsuario = formData.get("tipoUsuario");
-            const apiUrl= "http://192.168.1.111:3000/register";
+            const apiUrl= "https://musicfinderapi-amwf.onrender.com/register";
 
             let userData = {
         nombre: formData.get("nombre"),
@@ -106,7 +106,7 @@
     }).then(() => {if(userData.rol==="Estudiante"){
         window.location.href = "index.html";
     }else if(userData.rol==="Profesor"){
-        window.location.href = "indexProfesores.html";
+        window.location.href = "login.html";
     }
                 
          });

@@ -132,7 +132,7 @@
             };
 
             try {
-                const response = await axios.put(`http://192.168.1.111:3000/api/profiles/editProfile/${userId}`, perfil);
+                const response = await axios.put(`https://musicfinderapi-amwf.onrender.com/api/profiles/editProfile/${userId}`, perfil);
                 alert(response.data.message);
             } catch (error) {
                 console.error("Error al actualizar el perfil:", error);
@@ -147,7 +147,7 @@
             }
 
             try {
-                const response = await fetch(`http://192.168.1.111:3000/api/profiles/getProfile/${userId}`);
+                const response = await fetch(`https://musicfinderapi-amwf.onrender.com/api/profiles/getProfile/${userId}`);
                 const profesor = await response.json();
                 
                 document.getElementById('nombre').value = profesor.nombre || '';

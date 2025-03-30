@@ -160,7 +160,7 @@ function openNoteInput() {
             return;
         }
 
-        const profesorId = localStorage.getItem('userID'); // Obtenemos el ID del profesor desde localStorage
+        const profesorId = localStorage.getItem('profesorID'); // Obtenemos el ID del profesor desde localStorage
         if (!profesorId) {
             Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo obtener el ID del profesor.' });
             return;

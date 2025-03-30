@@ -58,30 +58,36 @@
 
     <script>
         const loginForm = document.getElementById('login-form');
-
+    
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
+    
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-
+    
             try {
                 const response = await fetch("https://musicfinderapi-amwf.onrender.com/login", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ correo: email, contraseña: password }) 
                 });
-
+    
                 const data = await response.json();
-                console.log("Respuesta del servidor:", data); // ⬅️ Verificar qué llega en consola
-
+                console.log("Respuesta del servidor:", data); // ⬅️ Verificar en consola
+    
                 if (response.ok && data.mensaje === "Inicio de sesión exitoso") {
-                    localStorage.setItem('userID', data.id);
-                    localStorage.setItem('userRole', data.rol); 
-    // Guardar profesorId si el usuario es profesor
-    if (data.rol === "Profesor") {
-        localStorage.setItem('profesorId', data.id);
-    }
+                    if (data.rol === "Profesor") {
+                        localStorage.setItem('profesorID', data.id);
+                        localStorage.setItem('profesorRole', data.rol);
+                        localStorage.removeItem('alumnoID'); // Borrar datos anteriores
+                        localStorage.removeItem('alumnoRole');
+                    } else {
+                        localStorage.setItem('alumnoID', data.id);
+                        localStorage.setItem('alumnoRole', data.rol);
+                        localStorage.removeItem('profesorID'); // Borrar datos anteriores
+                        localStorage.removeItem('profesorRole');
+                    }
+    
                     Swal.fire({
                         icon: 'success',
                         title: '¡Bienvenido!',
@@ -102,7 +108,7 @@
                         text: data.error || 'Credenciales incorrectas. Intenta nuevamente.',
                     });
                 }
-
+    
             } catch (error) {
                 console.error('Error al iniciar sesión:', error);
                 Swal.fire({
@@ -113,6 +119,7 @@
             }
         });
     </script>
+    
 
 </body>
 </html>

@@ -33,7 +33,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const fecha = urlParams.get("clase");
             const hora = urlParams.get("hora");
-            const estudianteId = localStorage.getItem("userID");
+            const estudianteId = localStorage.getItem("alumnoID");
 
             if (!fecha || !hora || !estudianteId) {
                 Swal.fire('Error', 'Información no válida.', 'error');

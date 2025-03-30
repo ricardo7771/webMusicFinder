@@ -97,7 +97,7 @@
     async function showNotes(date) {
     pendingNotes.innerHTML = '';
     try {
-        const profesorId = localStorage.getItem('userID'); // Obtener el ID del profesor logueado
+        const profesorId = localStorage.getItem('profesorID'); // Obtener el ID del profesor logueado
         if (!profesorId) {
             console.log("No se encontró el ID del profesor.");
             pendingNotes.innerHTML = '<li>No hay reservas</li>';

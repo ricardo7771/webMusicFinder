@@ -114,7 +114,7 @@
         async function guardarPerfil(event) {
             event.preventDefault();
 
-            const userId = localStorage.getItem('userID');
+            const userId = localStorage.getItem('profesorID');
             if (!userId) {
                 window.location.href = 'login.html';
                 return;
@@ -141,7 +141,7 @@
         }
 
         window.onload = async function() {
-            const userId = localStorage.getItem('userID');
+            const userId = localStorage.getItem('profesorID');
             if (!userId) {
                 window.location.href = 'login.html';
             }

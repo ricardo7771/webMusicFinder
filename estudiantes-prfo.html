@@ -49,7 +49,7 @@
     </div>
 
     <script>
-        const profesorId = "91746f7d-0551-46c2-b8a5-00f952c81301"; // ID del profesor (debe obtenerse dinámicamente)
+        const profesorId = localStorage.getElementById("profesorID"); // ID del profesor (debe obtenerse dinámicamente)
 
         async function cargarReservas() {
             const fecha = document.getElementById("fechaSeleccionada").value;

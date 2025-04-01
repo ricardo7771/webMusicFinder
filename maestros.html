@@ -28,7 +28,6 @@
                 <li><a href="./clases-estudaintes.html" class="hover:text-indigo-600 transition">Cursos</a></li>
                 <li><a href="./maestros.html" class="hover:text-indigo-600 transition">Maestros</a></li>
                 <li><a href="./misCursos_Estudiante.html" class="hover:text-indigo-600 transition">Mis Cursos</a></li>
-                <li><a href="./contacto.html" class="hover:text-indigo-600 transition">Contacto</a></li>
             </ul>
             <div id="auth-buttons"></div>
         </div>
@@ -57,7 +56,7 @@
 
         async function obtenerMaestros() {
             try {
-                const response = await fetch("https://musicfinderapi-amwf.onrender.com/professors"); // Ajusta la URL según corresponda
+                const response = await fetch("https://musicfinder-api-2.onrender.com/professors"); // Ajusta la URL según corresponda
                 if (!response.ok) throw new Error("Error al obtener datos");
 
                 maestrosData = await response.json(); 

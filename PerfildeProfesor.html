@@ -75,7 +75,7 @@
             }
     
             try {
-                const response = await fetch(`https://musicfinderapi-amwf.onrender.com/api/profiles/getProfile/${profesorId}`);
+                const response = await fetch(`https://musicfinder-api-2.onrender.com/api/profiles/getProfile/${profesorId}`);
                 if (!response.ok) throw new Error("No se pudo obtener la información del profesor");
     
                 const profesor = await response.json();

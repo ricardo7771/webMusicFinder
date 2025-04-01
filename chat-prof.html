@@ -51,7 +51,7 @@ if (!profesorId) {
     let alumnoSeleccionado = null;
   
     function obtenerReservasProfesor() {
-      fetch(`https://musicfinderapi-amwf.onrender.com/reservas/profesor/${profesorId}`)
+      fetch(`https://musicfinder-api-2.onrender.com/reservas/profesor/${profesorId}`)
         .then(response => response.json())
         .then(data => {
           mostrarListaChats(data);
